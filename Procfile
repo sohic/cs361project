@@ -1,1 +1,1 @@
-web: gunicorn app:microservices/zipcode
+web: gunicorn app:app
