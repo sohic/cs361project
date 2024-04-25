@@ -3,30 +3,29 @@ import requests
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
+@app.route('/<zipcode>')
+def home(zipcode):
     # URL of the first microservice to fetch zip code
-    # zip_url = "http://localhost:8003/zip"
-    # # Fetch the zip code data from the first microservice
-    # zip_response = requests.get(zip_url)
-    # if zip_response.status_code == 200:
-    #     zip_data = zip_response.json()
-    #     zipcode = zip_data.get('zipcode')  # Extracting the zip code from the response
-    # else:
-    #     return jsonify({'error': 'Failed to fetch zip code data'}), 500
+    zip = f"https://cs361getzip-07f82c667655.herokuapp.com/{zipcode}"
+    # Fetch the zip code data from the first microservice
+    zipResponse = requests.get(zip)
+    if zipResponse.status_code == 200:
+        zipData = zipResponse.json()
+        zipcode = zipData.get('zipcode')  # Extracting the zip code from the response
+    else:
+        return jsonify({'error': 'Failed to fetch zip code data'}), 500
 
-    # # URL of the weather microservice
-    # weather_url = f"http://localhost:8000/weather?zipcode={zipcode}"
-    # # Fetch the weather data from the weather microservice
-    # weather_response = requests.get(weather_url)
-    # if weather_response.status_code == 200:
-    #     weather_data = weather_response.json()  # Assuming the weather microservice returns JSON data
-    # else:
-    #     return jsonify({'error': 'Failed to fetch weather data'}), 500
+    # URL of the weather microservice
+    weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{zipcode}"
+    # Fetch the weather data from the weather microservice
+    weatherResponse = requests.get(weatherInfo)
+    if weatherResponse.status_code == 200:
+        weatherData = weatherResponse.json()  # Assuming the weather microservice returns JSON data
+    else:
+        return jsonify({'error': 'Failed to fetch weather data'}), 500
 
     # # Render the Jinja2 template, passing the weather data
-    # return render_template('main.j2', location=zip_data, weather=weather_data)
-    return 'this is a test'
+    return render_template('main.j2', location=zipData, weather=weatherData)
 
 @app.route('/about')
 def about():
