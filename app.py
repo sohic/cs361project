@@ -1,35 +1,150 @@
-from flask import Flask, render_template, jsonify
-import requests
+from flask import Flask, render_template, jsonify, request, session
+import requests, json
+from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 
-@app.route('/<zipcode>')
-def home(zipcode):
-    # URL of the first microservice to fetch zip code
-    zip = f"https://cs361getzip-07f82c667655.herokuapp.com/{zipcode}"
-    # Fetch the zip code data from the first microservice
-    zipResponse = requests.get(zip)
-    if zipResponse.status_code == 200:
-        zipData = zipResponse.json()
-        zipcode = zipData.get('zipcode')  # Extracting the zip code from the response
-    else:
-        return jsonify({'error': 'Failed to fetch zip code data'}), 500
+# global variables w/ default values
+gZip = "98275"
+gCity = "Mukilteo"
+gState = "WA"
+gTimeZone = "America/Los_Angeles"
 
+def get_current_time():
+    tz = pytz.timezone(gTimeZone)
+    time = datetime.now(tz)
+    #time = systemTime.astimezone(pytz.timezone(gTimeZone))
+    current_datetime = time.strftime('%Y-%m-%d %H:%M:%S')
+    return current_datetime
+
+@app.route('/')
+def home():
+    global gZip, gCity, gState, gTimeZone
+    location = {'zipcode': gZip, 'city': gCity, 'state': gState, 'timezone': gTimeZone}
+    
     # URL of the weather microservice
-    weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{zipcode}"
+    weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{gZip}"
     # Fetch the weather data from the weather microservice
     weatherResponse = requests.get(weatherInfo)
     if weatherResponse.status_code == 200:
         weatherData = weatherResponse.json()  # Assuming the weather microservice returns JSON data
     else:
         return jsonify({'error': 'Failed to fetch weather data'}), 500
+    current_datetime = get_current_time()
+    
+    return render_template('home.j2', location=location, current_datetime=current_datetime, weather=weatherData)
 
-    # # Render the Jinja2 template, passing the weather data
-    return render_template('main.j2', location=zipData, weather=weatherData)
+@app.route('/display')
+def display():
+    global gZip, gCity, gState, gTimeZone
+    location = {'zipcode': gZip, 'city': gCity, 'state': gState, 'timezone': gTimeZone}
+    
+    # URL of the weather microservice
+    weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{gZip}"
+    # Fetch the weather data from the weather microservice
+    weatherResponse = requests.get(weatherInfo)
+    if weatherResponse.status_code == 200:
+        weatherData = weatherResponse.json()  # Assuming the weather microservice returns JSON data
+    else:
+        return jsonify({'error': 'Failed to fetch weather data'}), 500
+    current_datetime = get_current_time()
+    
+    return render_template('display.j2', location=location, current_datetime=current_datetime, weather=weatherData)
 
-@app.route('/about')
-def about():
-    return 'This is the about page.'
+@app.route('/hourly')
+def hourly():
+    global gZip, gCity, gState, gTimeZone
+    location = {'zipcode': gZip, 'city': gCity, 'state': gState, 'timezone': gTimeZone}
+    current_datetime = get_current_time()
+    
+    hourly = f"https://cs361hourly-8b5c0db17698.herokuapp.com/coord/{gZip}"
+    hourlyResponse = requests.get(hourly)
+    if hourlyResponse.status_code == 200:
+        hourlyData = hourlyResponse.json()
+    else:
+        return jsonify({'error': 'Failed to fetch hourly weather data'}), 500
+    return render_template('hourly.j2', location=location, current_datetime=current_datetime, hourly=hourlyData)
+
+@app.route('/help')
+def help():
+
+    return render_template('help.j2')
+
+@app.route('/weekly')
+def weekly():
+    global gZip, gCity, gState, gTimeZone
+    location = {'zipcode': gZip, 'city': gCity, 'state': gState, 'timezone': gTimeZone}
+    current_datetime = get_current_time()
+    
+    weekly = f"https://cs361hourly-8b5c0db17698.herokuapp.com/coord/{gZip}"
+    weeklyResponse = requests.get(weekly)
+    if weeklyResponse.status_code == 200:
+        weeklyData = weeklyResponse.json()
+    else:
+        return jsonify({'error': 'Failed to fetch hourly weather data'}), 500
+    return render_template('weekly.j2', location=location, current_datetime=current_datetime, weekly=weeklyData)
+
+@app.route('/search')
+def search():
+    global gZip, gCity, gState, gTimeZone
+    location = {'zipcode': gZip, 'city': gCity, 'state': gState, 'timezone': gTimeZone}
+    current_datetime = get_current_time()
+    return render_template('search.j2', location=location, current_datetime=current_datetime)
+
+@app.route('/submit_location', methods=['POST'])
+def submit_location():
+    global gZip, gCity, gState, gTimeZone
+    zipcode = request.form['zipcode']
+    if (zipcode != ""):
+        zip = f"https://cs361getzip-07f82c667655.herokuapp.com/{zipcode}"
+        zipResponse = requests.get(zip)
+        if zipResponse.status_code == 200:
+            zipData = zipResponse.json()
+            gZip = zipData.get('zipcode')  # Extracting the zip code from the response
+            gCity = zipData.get('city')
+            gState = zipData.get('state')
+        else:
+            return jsonify({'error': 'Failed to fetch zip code data'}), 500
+
+    # URL of the weather microservice
+    weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{gZip}"
+    # Fetch the weather data from the weather microservice
+    weatherResponse = requests.get(weatherInfo)
+    if weatherResponse.status_code == 200:
+        weatherData = weatherResponse.json()  # Assuming the weather microservice returns JSON data
+        gTimeZone = weatherData["timezone"]
+    else:
+        return jsonify({'error': 'Failed to fetch weather data'}), 500
+    
+    zipDataFinal = {
+        'zipcode': gZip,
+        'city': gCity,
+        'state': gState,
+        'timezone': gTimeZone
+    }
+
+    current_datetime = get_current_time()
+    return render_template('home.j2', location=zipDataFinal, weather=weatherData, current_datetime=current_datetime)
+
+@app.route('/convert', methods=['POST'])
+def convert_temperature():
+    data = request.get_json()
+    temperature = data['temperature']
+    is_fahrenheit = data['isFahrenheit']
+
+    if is_fahrenheit:
+        convert = f"https://chenbry.pythonanywhere.com/c2f?values={temperature}"
+        convertResponse = requests.get(convert)
+        if convertResponse.status_code == 200:
+            newData = convertResponse.json()
+            new_temp = newData['fahrenheit_values'][0]
+    else:
+        # Convert Fahrenheit to Celsius
+        new_temp = (temperature - 32) * 5/9
+
+    # The new temperature is rounded to two decimal places
+    return jsonify(temperature=round(new_temp, 2))
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

@@ -2,16 +2,104 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Zip Code Information</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='jss/script.js') }}"></script>
+    <style>
+    </style>
 </head>
 <body>
-    <h1>Zip Code Details</h1>
-    {% if location %}
-        <p>Zip Code: {{ location.zipcode }}</p>
-        <p>City: {{ location.city }}</p>
-        <p>State: {{ location.state }}</p>
-    {% else %}
-        <p>No location data available.</p>
-    {% endif %}
+    <header class="header">
+        <div class="figure-container">
+          <a href="/search">
+            <img src="../static/img/location.png" alt="Location" class="small-image-location">
+            <figcaption>Location</figcaption>
+          </a>
+          <a href="/help">
+            <img src="../static/img/help.png" alt="Help" class="small-image-help">
+            <figcaption>Help</figcaption>
+          </a>
+        </div>
+        <div class="title-container">
+          <h1 class="title">Weather App</h1>
+        </div>
+        <div class="figure-container-menu dropdown-menu">
+          <img src="../static/img/menu.png" alt="Dropdown Icon" class="small-image">
+          <figcaption>Menu</figcaption>
+          <div class="dropdown-menu-content">
+            <a href="/">Home</a>
+            <a href="/search">Set Location</a>
+            <a href="/hourly">Hourly</a>
+            <a href="/weekly">Weekly Weather Forecast</a>
+            <a href="/help">Help</a>
+          </div>
+        </div>
+      </header>
+
+    <div class="container dateLoc">
+        <p><span id="datetime">{{ current_datetime }}</span></p>
+        <p><span id="locationHome">{{ location.get('city', 'Not available') if location }} {{ location.get('state', 'Not available') if location }}</span></p>
+        <p><span id="locationTZ">{{ location.get('timezone', 'Not available') if location }}</span></p>
+    </div>
+    <div>
+        <h3> Easily change location and view weather of desired destination by clicking the "location" icon on top left of the screen. </h3>
+    </div>
+
+    <div class="container display-container">
+        <h2>SELECT TO DISPLAY</h2>
+        <formid="displayForm">
+            <input type="radio" id="hourly" name="displayOption" value="hourly">
+            <label for="hourly">Hourly Forecast</label><br>
+            <input type="radio" id="weekly" name="displayOption" value="weekly">
+            <label for="weekly">Weekly Weather Forecast</label><br>
+        </form>
+        <input type="submit" value="Display" onclick="displaySelectedOption()">
+            <p>Track changing weather using the different display options.</p>
+    </div>
+
+    <a href="/" id="display-options">Hide Features</a>
+
+
+    <div>
+        <h1>Current Weather for {{ location.get('city', 'Not available') if location }} {{ location.get('state', 'Not available') if location }}</h1>
+    </div>
+    <div class="container units-switch">
+      <span class="unit-label">Celsius (&deg;C)</span>
+      <label class="switch">
+          <input type="checkbox" id="unitSwitch">
+          <span class="slider round"></span>
+      </label>
+      <span class="unit-label">Fahrenheit (&deg;F)</span>    
+  </div>
+    <div class="container currentweather">
+        <p><span id="currentTemp">{{ weather.get('temperature', 'Not available') if weather }}°</span></p>
+        <p><span id="currentDesc">{{ weather.get('description', 'Not available') if weather }}</span></p>
+    </div>
+    
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(function() {
+        $('#unitSwitch').change(function() {
+            var isFahrenheit = $(this).is(':checked');
+            var tempText = $('#currentTemp').text();
+            var temp = parseFloat(tempText.substring(0, tempText.length - 1));  // Remove the degree symbol and parse
+
+            $.ajax({
+                url: '/convert',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ temperature: temp, isFahrenheit: isFahrenheit }),
+                success: function(response) {
+                    $('#currentTemp').text(response.temperature + '°');
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

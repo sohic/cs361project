@@ -1,0 +1,286 @@
+header {
+    background-color: #51829B;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body {
+    background-color: #9BB0C1;
+}
+
+.title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 40px; /* Double the font size */
+}
+
+.dropdown-menu {
+    position: relative;
+    display: inline-block;
+    margin-right: 70px;
+}
+
+.figure-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Adds space between the links */
+  }
+
+.figure-container-menu {
+    text-align: center;
+    margin-right: 70px;
+}
+
+.figure-container-home {
+    text-align: center;
+    margin-left: 20px
+}
+
+.figure-container a {
+    text-align: center;
+    margin: 0 10px; /* Adjust spacing between links as needed */
+}
+
+.figure-container img {
+    display: block;
+    margin: 0 auto;
+}
+
+.figure-container figcaption {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+.small-image {
+    width: 50px;
+    height: 50px;
+  }
+
+.small-image-location {
+    width: 50px;
+    height: 50px;
+    margin-left: 70px;
+}
+
+.small-image-home {
+    width: 50px;
+    height: 50px;
+  }
+
+#datetime {
+    margin-left: 20px;
+}
+
+#locationTZ {
+    margin-right: 30px;
+}
+
+.dropdown-menu-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-menu-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-menu-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-menu:hover .dropdown-menu-content {
+    display: block;
+}
+
+.dateLoc {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 20px; /* Double the font size */
+}
+
+
+
+.date,
+.location {
+    display: inline; /* Display inline */
+}
+
+/*  Form Display*/
+.display-container {
+    position: relative;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+
+  .display-container h2 {
+    text-align: center;
+  }
+
+  #displayForm {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  #displayForm .form-item {
+    display: flex;
+    align-items: center;
+  }
+
+  #displayForm .form-item label {
+    margin-left: 5px;
+  }
+
+  .display-container input[type="submit"] {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .display-container input[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+
+.hourly-container table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.hourly-container th,
+.hourly-container td {
+    width: calc(100% / 7);
+    padding: 8px; /* Adjust padding as needed */
+    border: 1px solid #ccc; /* Add border for each cell */
+    text-align: center; /* Center-align content in cells */
+}
+
+/* Make first row bold */
+.hourly-container th:first-child {
+    font-weight: bold;
+}
+
+/* Make first column bold */
+.hourly-container td:first-child {
+    font-weight: bold;
+}
+
+.currentweather {
+    justify-content: space-around;
+    align-items: center;
+    height: 50vh; /* Adjust as needed */
+  }
+
+  .currentweather p {
+    margin: 30px;
+    flex: 1;
+    text-align: left;
+  }
+
+  #currentTemp {
+    font-size: 8em;
+  }
+
+  #currentDesc {
+    font-size: 4em;
+  }
+
+  .small-image-help {
+    width: 50px;
+    height: 50px;
+    margin-left: 70px;
+}
+
+.units-switch {
+    display: flex; /* Use flexbox to align items */
+    align-items: center; /* Align items vertically */
+}
+
+.unit-label {
+    font-size: 20px; /* Set font size */
+    margin-right: 10px; /* Add some spacing between label and switch */
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin: 0 10px; /* Adjusted margin for the switch */
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='jss/script.js') }}"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="figure-container">
+          <a href="/">
+            <img src="../static/img/home.png" alt="Home" class="small-image-home">
+            <figcaption>Home</figcaption>
+          </a>
+          <a href="/search">
+            <img src="../static/img/location.png" alt="Location" class="small-image-location">
+            <figcaption>Location</figcaption>
+          </a>
+          <a href="/help">
+            <img src="../static/img/help.png" alt="Help" class="small-image-help">
+            <figcaption>Help</figcaption>
+          </a>
+        </div>
+        <div class="title-container">
+          <h1 class="title">Weather App</h1>
+        </div>
+        <div class="figure-container-menu dropdown-menu">
+          <img src="../static/img/menu.png" alt="Dropdown Icon" class="small-image">
+          <figcaption>Menu</figcaption>
+          <div class="dropdown-menu-content">
+            <a href="/">Home</a>
+            <a href="/search">Set Location</a>
+            <a href="/hourly">Hourly</a>
+            <a href="/weekly">Weekly Weather Forecast</a>
+            <a href="/help">Help</a>
+          </div>
+        </div>
+      </header>
+  
+      <div class="container dateLoc">
+        <p><span id="datetime">{{ current_datetime }}</span></p>
+        <p><span id="locationHome">{{ location.get('city', 'Not available') if location }} {{ location.get('state', 'Not available') if location }}</span></p>
+        <p>
+            <label for="locationTZ">Time Zone:</label>
+            <span id="locationTZ">{{ location.get('timezone', 'Not available') if location }}</span>
+          </p>
+    </div>
+
+    <div class="container units-switch">
+        <span class="unit-label">Celsius (&deg;C)</span>
+        <label class="switch">
+            <input type="checkbox" id="unitSwitch">
+            <span class="slider round"></span>
+        </label>
+        <span class="unit-label">Fahrenheit (&deg;F)</span>    
+    </div>
+    <div class="container hourly-container">
+        <h2> Hourly Weather Forecast </h2>
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>{{ hourly.get('1', 'Not available')['time'] if hourly }}</th>
+                <th>{{ hourly.get('2', 'Not available')['time'] if hourly }}</th>
+                <th>{{ hourly.get('3', 'Not available')['time'] if hourly }}</th>
+                <th>{{ hourly.get('4', 'Not available')['time'] if hourly }}</th>
+                <th>{{ hourly.get('5', 'Not available')['time'] if hourly }}</th>
+                <th>{{ hourly.get('6', 'Not available')['time'] if hourly }}</th>
+                <th>{{ hourly.get('7', 'Not available')['time'] if hourly }}</th>
+            </tr>
+            <tr>
+                <td>Temperature</td>
+                <td id="temp0">{{ hourly.get('1', 'Not available')['temp'] if hourly }}</td>
+                <td id="temp1">{{ hourly.get('2', 'Not available')['temp'] if hourly }}</td>
+                <td id="temp2">{{ hourly.get('3', 'Not available')['temp'] if hourly }}</td>
+                <td id="temp3">{{ hourly.get('4', 'Not available')['temp'] if hourly }}</td>
+                <td id="temp4">{{ hourly.get('5', 'Not available')['temp'] if hourly }}</td>
+                <td id="temp5">{{ hourly.get('6', 'Not available')['temp'] if hourly }}</td>
+                <td id="temp6">{{ hourly.get('7', 'Not available')['temp'] if hourly }}</td>
+            </tr>
+            <tr>
+                <td>Weather Conditions</td>
+                <td>{{ hourly.get('1', 'Not available')['forecast'] if hourly }}</td>
+                <td>{{ hourly.get('2', 'Not available')['forecast'] if hourly }}</td>
+                <td>{{ hourly.get('3', 'Not available')['forecast'] if hourly }}</td>
+                <td>{{ hourly.get('4', 'Not available')['forecast'] if hourly }}</td>
+                <td>{{ hourly.get('5', 'Not available')['forecast'] if hourly }}</td>
+                <td>{{ hourly.get('6', 'Not available')['forecast'] if hourly }}</td>
+                <td>{{ hourly.get('7', 'Not available')['forecast'] if hourly }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            $(document).ready(function() {
+                $('#unitSwitch').change(function() {
+                    var isFahrenheit = $(this).is(':checked');
+        
+                    // Iterate over all temperature cells
+                    for (var i = 0; i <= 7; i++) {
+                        var cellID = '#temp' + i;
+                        var tempText = $(cellID).text();
+                        var temp = parseFloat(tempText);
+        
+                        $.ajax({
+                            url: '/convert',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ temperature: temp, isFahrenheit: isFahrenheit }),
+                            success: (function(cellID) {
+                                return function(response) {
+                                    $(cellID).text(response.temperature);
+                                };
+                            })(cellID),
+                            error: function(error) {
+                                console.log('Error:', error);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

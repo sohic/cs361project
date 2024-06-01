@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='jss/script.js') }}"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="figure-container">
+          <a href="/">
+            <img src="../static/img/home.png" alt="Home" class="small-image-home">
+            <figcaption>Home</figcaption>
+          </a>
+          <a href="/search">
+            <img src="../static/img/location.png" alt="Location" class="small-image-location">
+            <figcaption>Location</figcaption>
+          </a>
+          <a href="/help">
+            <img src="../static/img/help.png" alt="Help" class="small-image-help">
+            <figcaption>Help</figcaption>
+          </a>
+        </div>
+        <div class="title-container">
+          <h1 class="title">Weather App</h1>
+        </div>
+        <div class="figure-container-menu dropdown-menu">
+          <img src="../static/img/menu.png" alt="Dropdown Icon" class="small-image">
+          <figcaption>Menu</figcaption>
+          <div class="dropdown-menu-content">
+            <a href="/">Home</a>
+            <a href="/search">Set Location</a>
+            <a href="/hourly">Hourly</a>
+            <a href="/weekly">Weekly Weather Forecast</a>
+            <a href="/help">Help</a>
+          </div>
+        </div>
+      </header>
+    
+    <div class="container dateLoc">
+        <p><span id="datetime">{{ current_datetime }}</span></p>
+        <p><span id="location">{{ location.get('city', 'Not available') if location }} {{ location.get('state', 'Not available') if location }}</span></p>
+        <p><span id="locationTZ">{{ location.get('timezone', 'Not available') if location }}</span></p>
+    </div>
+    <div class="container units-switch">
+        <span class="unit-label">Celsius (&deg;C)</span>
+        <label class="switch">
+            <input type="checkbox" id="unitSwitch">
+            <span class="slider round"></span>
+        </label>
+        <span class="unit-label">Fahrenheit (&deg;F)</span>    
+    </div>
+    <div class="container hourly-container">
+        <h2> Weekly Weather Forecast </h2>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Today</th>
+                <th>{{ weekly.get('2', 'Not available')['date'] if weekly }}</th>
+                <th>{{ weekly.get('3', 'Not available')['date'] if weekly }}</th>
+                <th>{{ weekly.get('4', 'Not available')['date'] if weekly }}</th>
+                <th>{{ weekly.get('5', 'Not available')['date'] if weekly }}</th>
+                <th>{{ weekly.get('6', 'Not available')['date'] if weekly }}</th>
+                <th>{{ weekly.get('7', 'Not available')['date'] if weekly }}</th>
+                <th>{{ weekly.get('8', 'Not available')['date'] if weekly }}</th>
+            </tr>
+            <tr>
+                <td>Temperature (High)</td>
+                <td id="temp0Max">{{ weekly.get('1', 'Not available')['tempMax'] if weekly }}</td>
+                <td id="temp1Max">{{ weekly.get('2', 'Not available')['tempMax'] if weekly }}</td>
+                <td id="temp2Max">{{ weekly.get('3', 'Not available')['tempMax'] if weekly }}</td>
+                <td id="temp3Max">{{ weekly.get('4', 'Not available')['tempMax'] if weekly }}</td>
+                <td id="temp4Max">{{ weekly.get('5', 'Not available')['tempMax'] if weekly }}</td>
+                <td id="temp5Max">{{ weekly.get('6', 'Not available')['tempMax'] if weekly }}</td>
+                <td id="temp6Max">{{ weekly.get('7', 'Not available')['tempMax'] if weekly }}</td>
+                <td id="temp7Max">{{ weekly.get('8', 'Not available')['tempMax'] if weekly }}</td>
+            </tr>
+            <tr>
+                <td>Temperature (Low)</td>
+                <td id="temp0Min">{{ weekly.get('1', 'Not available')['tempMin'] if weekly }}</td>
+                <td id="temp1Min">{{ weekly.get('2', 'Not available')['tempMin'] if weekly }}</td>
+                <td id="temp2Min">{{ weekly.get('3', 'Not available')['tempMin'] if weekly }}</td>
+                <td id="temp3Min">{{ weekly.get('4', 'Not available')['tempMin'] if weekly }}</td>
+                <td id="temp4Min">{{ weekly.get('5', 'Not available')['tempMin'] if weekly }}</td>
+                <td id="temp5Min">{{ weekly.get('6', 'Not available')['tempMin'] if weekly }}</td>
+                <td id="temp6Min">{{ weekly.get('7', 'Not available')['tempMin'] if weekly }}</td>
+                <td id="temp7Min">{{ weekly.get('8', 'Not available')['tempMin'] if weekly }}</td>
+            </tr>
+            <tr>
+                <td>Weather Conditions</td>
+                <td>{{ weekly.get('1', 'Not available')['forecast'] if weekly }}</td>
+                <td>{{ weekly.get('2', 'Not available')['forecast'] if weekly }}</td>
+                <td>{{ weekly.get('3', 'Not available')['forecast'] if weekly }}</td>
+                <td>{{ weekly.get('4', 'Not available')['forecast'] if weekly }}</td>
+                <td>{{ weekly.get('5', 'Not available')['forecast'] if weekly }}</td>
+                <td>{{ weekly.get('6', 'Not available')['forecast'] if weekly }}</td>
+                <td>{{ weekly.get('7', 'Not available')['forecast'] if weekly }}</td>
+                <td>{{ weekly.get('8', 'Not available')['forecast'] if weekly }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            $(document).ready(function() {
+                $('#unitSwitch').change(function() {
+                    var isFahrenheit = $(this).is(':checked');
+        
+                    // Iterate over all temperature cells
+                    for (var i = 0; i <= 7; i++) {
+                        var cellID = '#temp' + i + "Max";
+                        var tempText = $(cellID).text();
+                        var temp = parseFloat(tempText);
+        
+                        $.ajax({
+                            url: '/convert',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ temperature: temp, isFahrenheit: isFahrenheit }),
+                            success: (function(cellID) {
+                                return function(response) {
+                                    $(cellID).text(response.temperature);
+                                };
+                            })(cellID),
+                            error: function(error) {
+                                console.log('Error:', error);
+                            }
+                        });
+                    }
+                    for (var i = 0; i <= 7; i++) {
+                        var cellID = '#temp' + i + "Min";
+                        var tempText = $(cellID).text();
+                        var temp = parseFloat(tempText);
+        
+                        $.ajax({
+                            url: '/convert',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ temperature: temp, isFahrenheit: isFahrenheit }),
+                            success: (function(cellID) {
+                                return function(response) {
+                                    $(cellID).text(response.temperature);
+                                };
+                            })(cellID),
+                            error: function(error) {
+                                console.log('Error:', error);
+                            }
+                        });
+                    }
+                });
+            });
+        });
+        
+    </script>
+
+    
+</body>
+</html>

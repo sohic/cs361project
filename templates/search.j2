@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='jss/script.js') }}"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="figure-container">
+          <a href="/">
+            <img src="../static/img/home.png" alt="Home" class="small-image-home">
+            <figcaption>Home</figcaption>
+          </a>
+          <a href="/help">
+            <img src="../static/img/help.png" alt="help" class="small-image-help">
+            <figcaption>Help</figcaption>
+          </a>
+        </div>
+        <div class="title-container">
+          <h1 class="title">Weather App</h1>
+        </div>
+        <div class="figure-container-menu dropdown-menu">
+          <img src="../static/img/menu.png" alt="Dropdown Icon" class="small-image">
+          <figcaption>Menu</figcaption>
+          <div class="dropdown-menu-content">
+            <a href="/">Home</a>
+            <a href="/search">Set Location</a>
+            <a href="/hourly">Hourly</a>
+            <a href="/tenDay">10-Day Forecast</a>
+            <a href="/help">Help</a>
+          </div>
+        </div>
+      </header>
+
+    <div class="container dateLoc">
+        <p><span id="datetime">{{ current_datetime }}</span></p>
+        <p><span id="locationHome">{{ location.get('city', 'Not available') if location }} {{ location.get('state', 'Not available') if location }}</span></p>
+        <p><span id="locationTZ">{{ location.get('timezone', 'Not available') if location }}</span></p>
+    </div>
+    
+    <div class="container">
+        <h2>Change Location</h2>
+        <form id="locationForm" action="/submit_location" method="post" onsubmit="return confirmSubmit()">
+            <label for="zipcode">Zip Code:</label>
+            <input type="text" id="zipcodeSearch" name="zipcode" value="{{ location.get('zipcode', 'Not available') if location }}"><br><br>
+            <button type="submit" onclick="setZip()">Submit</button>
+            <button type="button" onclick="cancelForm()">Cancel</button>
+        </form>
+    </div>
+    <script>
+        function confirmSubmit() {
+            return confirm("You are about to change the location.  All previous weather data will be lost.  Do you wish to proceed?");
+        }
+     
+    </script>
+</body>
+</html>

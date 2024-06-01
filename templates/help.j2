@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='jss/script.js') }}"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="figure-container">
+          <a href="/">
+            <img src="../static/img/home.png" alt="Home" class="small-image-home">
+            <figcaption>Home</figcaption>
+          </a>
+          <a href="/search">
+            <img src="../static/img/location.png" alt="Location" class="small-image-location">
+            <figcaption>Location</figcaption>
+          </a>
+        </div>
+        <div class="title-container">
+          <h1 class="title">Weather App</h1>
+        </div>
+        <div class="figure-container-menu dropdown-menu">
+          <img src="../static/img/menu.png" alt="Dropdown Icon" class="small-image">
+          <figcaption>Menu</figcaption>
+          <div class="dropdown-menu-content">
+            <a href="/">Home</a>
+            <a href="/search">Set Location</a>
+            <a href="/hourly">Hourly</a>
+            <a href="/weekly">Weekly Weather Forecast</a>
+            <a href="#">Help</a>
+          </div>
+        </div>
+      </header>
+
+
+    <h2> How to change look up weather/change location</h2>
+    <h3> 1.  Click on the location icon on top left.</h3>
+    <a href="/">
+            <img src="../static/img/help01.png" alt="help01" class="large-image-help01">
+    </a>
+    <h3> 2.  Fill in the zipcode.</h3>
+    <h3> 3.  Press the submit button.</h3>
+    <a href="/">
+        <img src="../static/img/help02.png" alt="help02" class="large-image-help02">
+    </a>
+    <h3> 4.  Confirm that you want to change location on the pop up message.</h3>
+    <a href="/">
+        <img src="../static/img/help03.png" alt="help03" class="large-image-help03">
+    </a>
+
+    
+</body>
+</html>
