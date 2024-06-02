@@ -60,7 +60,7 @@ def hourly():
     location = {'zipcode': gZip, 'city': gCity, 'state': gState, 'timezone': gTimeZone}
     current_datetime = get_current_time()
     
-    hourly = f"https://cs361hourly-8b5c0db17698.herokuapp.com/coord/{gZip}"
+    hourly = f"https://cs361hourly-cc75e39efe2a.herokuapp.com/coord/{gZip}"
     hourlyResponse = requests.get(hourly)
     if hourlyResponse.status_code == 200:
         hourlyData = hourlyResponse.json()
@@ -81,7 +81,7 @@ def weekly():
     location = {'zipcode': gZip, 'city': gCity, 'state': gState, 'timezone': gTimeZone}
     current_datetime = get_current_time()
     
-    weekly = f"https://cs361hourly-8b5c0db17698.herokuapp.com/coord/{gZip}"
+    weekly = f"https://cs361daily-20f4b9580bce.herokuapp.com//coord/{gZip}"
     weeklyResponse = requests.get(weekly)
     if weeklyResponse.status_code == 200:
         weeklyData = weeklyResponse.json()
