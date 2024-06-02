@@ -66,8 +66,8 @@ def hourly():
     current_datetime = get_current_time()
     
     hourly = f"https://cs361hourly-cc75e39efe2a.herokuapp.com/coord/{gZip}"
-    logger.info('Outgoing request: %s', hourly.request.url)
     hourlyResponse = requests.get(hourly)
+    logger.info('Outgoing request: %s', hourlyResponse.request.url)
     if hourlyResponse.status_code == 200:
         hourlyData = hourlyResponse.json()
     else:
