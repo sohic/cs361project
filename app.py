@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, render_template, jsonify, request, make_response
 import requests, json
 from datetime import datetime
 import pytz
@@ -35,6 +35,7 @@ def home():
     
     return render_template('home.j2', location=location, current_datetime=current_datetime, weather=weatherData)
 
+#################################################################################################################################
 @app.route('/display')
 def display():
     global gZip, gCity, gState, gTimeZone
@@ -52,6 +53,7 @@ def display():
     
     return render_template('display.j2', location=location, current_datetime=current_datetime, weather=weatherData)
 
+###################################################################################################################################
 @app.route('/hourly')
 def hourly():
     global gZip, gCity, gState, gTimeZone
@@ -66,11 +68,13 @@ def hourly():
         return jsonify({'error': 'Failed to fetch hourly weather data'}), 500
     return render_template('hourly.j2', location=location, current_datetime=current_datetime, hourly=hourlyData)
 
+#######################################################################################################################################
 @app.route('/help')
 def help():
 
     return render_template('help.j2')
 
+#######################################################################################################################################
 @app.route('/weekly')
 def weekly():
     global gZip, gCity, gState, gTimeZone
@@ -85,6 +89,7 @@ def weekly():
         return jsonify({'error': 'Failed to fetch hourly weather data'}), 500
     return render_template('weekly.j2', location=location, current_datetime=current_datetime, weekly=weeklyData)
 
+########################################################################################################################################
 @app.route('/search')
 def search():
     global gZip, gCity, gState, gTimeZone
@@ -92,6 +97,7 @@ def search():
     current_datetime = get_current_time()
     return render_template('search.j2', location=location, current_datetime=current_datetime)
 
+##########################################################################################################################################
 @app.route('/submit_location', methods=['POST'])
 def submit_location():
     global gZip, gCity, gState, gTimeZone
@@ -105,7 +111,14 @@ def submit_location():
             gCity = zipData.get('city')
             gState = zipData.get('state')
         else:
-            return jsonify({'error': 'Failed to fetch zip code data'}), 500
+            message = "Invalid zipcode! Enter a valid US zipcode"
+            response = make_response(f"""
+            <script>
+                alert('{message}');
+                setTimeout(function(){{window.location.href = '/search'}}, 100);
+            </script>
+            """)
+            return response
 
     # URL of the weather microservice
     weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{gZip}"
@@ -115,7 +128,14 @@ def submit_location():
         weatherData = weatherResponse.json()  # Assuming the weather microservice returns JSON data
         gTimeZone = weatherData["timezone"]
     else:
-        return jsonify({'error': 'Failed to fetch weather data'}), 500
+        message = "Weather microservice is currently offline."
+        response = make_response(f"""
+        <script>
+            alert('{message}');
+            setTimeout(function(){{window.location.href = '/search'}}, 100);
+        </script>
+        """)
+        return response
     
     zipDataFinal = {
         'zipcode': gZip,
@@ -127,6 +147,7 @@ def submit_location():
     current_datetime = get_current_time()
     return render_template('home.j2', location=zipDataFinal, weather=weatherData, current_datetime=current_datetime)
 
+################################################################################################################################
 @app.route('/convert', methods=['POST'])
 def convert_temperature():
     data = request.get_json()
