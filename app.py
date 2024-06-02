@@ -2,8 +2,12 @@ from flask import Flask, render_template, jsonify, request, make_response
 import requests, json
 from datetime import datetime
 import pytz
+import logging
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # global variables w/ default values
 gZip = "98275"
@@ -27,6 +31,7 @@ def home():
     weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{gZip}"
     # Fetch the weather data from the weather microservice
     weatherResponse = requests.get(weatherInfo)
+    logger.info('Outgoing request: %s', weatherResponse.request.url)
     if weatherResponse.status_code == 200:
         weatherData = weatherResponse.json()  # Assuming the weather microservice returns JSON data
     else:
@@ -61,11 +66,12 @@ def hourly():
     current_datetime = get_current_time()
     
     hourly = f"https://cs361hourly-cc75e39efe2a.herokuapp.com/coord/{gZip}"
+    logger.info('Outgoing request: %s', hourly.request.url)
     hourlyResponse = requests.get(hourly)
     if hourlyResponse.status_code == 200:
         hourlyData = hourlyResponse.json()
     else:
-        return jsonify({'error': 'Failed to fetch hourly weather data'}), 500
+        return jsonify({'error': 'Failed to fetch weather data'}), 500
     return render_template('hourly.j2', location=location, current_datetime=current_datetime, hourly=hourlyData)
 
 #######################################################################################################################################
@@ -83,10 +89,11 @@ def weekly():
     
     weekly = f"https://cs361daily-20f4b9580bce.herokuapp.com//coord/{gZip}"
     weeklyResponse = requests.get(weekly)
+    logger.info('Outgoing request: %s', weeklyResponse.request.url)
     if weeklyResponse.status_code == 200:
         weeklyData = weeklyResponse.json()
     else:
-        return jsonify({'error': 'Failed to fetch hourly weather data'}), 500
+        return jsonify({'error': 'Failed to fetch weather data'}), 500
     return render_template('weekly.j2', location=location, current_datetime=current_datetime, weekly=weeklyData)
 
 ########################################################################################################################################
@@ -157,6 +164,7 @@ def convert_temperature():
     if is_fahrenheit:
         convert = f"https://chenbry.pythonanywhere.com/c2f?values={temperature}"
         convertResponse = requests.get(convert)
+        logger.info('Outgoing request: %s', convertResponse.request.url)
         if convertResponse.status_code == 200:
             newData = convertResponse.json()
             new_temp = newData['fahrenheit_values'][0]
