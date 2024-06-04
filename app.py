@@ -170,7 +170,7 @@ def convert_temperature():
             new_temp = newData['fahrenheit_values'][0]
     else:
         # Convert Fahrenheit to Celsius
-        new_temp = (temperature - 32) * 5/9
+        new_temp = (eval(temperature) - 32) * 5/9
 
     # The new temperature is rounded to two decimal places
     return jsonify(temperature=round(new_temp, 2))
