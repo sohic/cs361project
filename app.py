@@ -129,7 +129,7 @@ def submit_location():
             return response
 
     # URL of the weather microservice
-    weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{gZip}"
+    weatherInfo = f"https://cs361weather-39533f33981a.herokuapp.com/{zipcode}"
     # Fetch the weather data from the weather microservice
     weatherResponse = requests.get(weatherInfo)
     if weatherResponse.status_code == 200:
