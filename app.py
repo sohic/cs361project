@@ -112,7 +112,7 @@ def submit_location():
     if (zipcode != ""):
         zip = f"https://cs361getzip-07f82c667655.herokuapp.com/{zipcode}"
         zipResponse = requests.get(zip)
-        logger.info('Outgoing request: %s', weeklyResponse.request.url)
+        logger.info('Outgoing request: %s', zipResponse.request.url)
         if zipResponse.status_code == 200:
             zipData = zipResponse.json()
             gZip = zipData.get('zipcode')  # Extracting the zip code from the response
