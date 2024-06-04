@@ -133,7 +133,7 @@ def submit_location():
     weatherResponse = requests.get(weatherInfo)
     if weatherResponse.status_code == 200:
         weatherData = weatherResponse.json()  # Assuming the weather microservice returns JSON data
-        gTimeZone = weatherData.get["timezone"]
+        gTimeZone = weatherData.get('timezone')
     else:
         message = "Weather microservice is currently offline."
         response = make_response(f"""
